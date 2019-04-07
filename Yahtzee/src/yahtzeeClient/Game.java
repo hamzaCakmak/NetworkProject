@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package yahtzeeClient;
+package game;
 
+import java.awt.Color;
 import java.awt.Image;
+import java.awt.Label;
 
 import java.io.IOException;
 import java.util.Random;
@@ -13,18 +15,46 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-
+import javax.swing.JLabel;
+import yahtzeeClient.Client;
 
 /**
  *
  * @author PC
  */
 public class Game extends javax.swing.JFrame {
-       
-    public static Game yahtzee;
-    public int rivalSelection = -1;
-    public int myselection = -1;
     
+    public Score score = new Score();
+    public static Game ThisGame;
+    public int turns = 0;
+    public int[] myDesk = new int [5];
+    public int[] rivalDesk = new int [5];
+    public int rollCount = 0;
+    int[] diceValues = new int [5];
+    
+    public void changeIcon(JLabel die,JLabel pick,JLabel emptyLbl){
+        if(!isLabelEmpty(die)){
+            pick.setIcon(die.getIcon());
+            die.setIcon(emptyLbl.getIcon());
+        }
+    }
+    public boolean isLabelEmpty(JLabel die){
+        String urlLabel=die.getIcon().toString();
+        String imageNameLabel = urlLabel.substring(urlLabel.lastIndexOf( "/" )+1, urlLabel.length()) ;
+        return imageNameLabel.equals("white.png");
+    }
+    public void setImages(JLabel die){
+        int diceNum = Integer.parseInt((die.getText().substring(die.getText().length()-1)));
+         if(!isLabelEmpty(die)){
+            die.setIcon(icons[diceValues[diceNum-1]]);
+        }
+    }
+    public void setPlayerDeskImages(JLabel die,int[] desk){
+        int diceNum = Integer.parseInt((die.getText().substring(die.getText().length()-1)));
+         if(!isLabelEmpty(die)){
+            die.setIcon(icons[desk[diceNum-1]]);
+        }
+    }
     ImageIcon icons[];
     Random rand;
     /**
@@ -33,26 +63,30 @@ public class Game extends javax.swing.JFrame {
     @SuppressWarnings("empty-statement")
     public Game() {
        initComponents();
-       yahtzee = this;
-       
-//        try {
-//            icons = new ImageIcon[5];
-//            icons[0] = new ImageIcon(new ImageIcon(ImageIO.read(this.getClass().getClassLoader().getResource("images/die1.png"))).getImage().getScaledInstance(lbl_die1.getWidth(), lbl_die1.getHeight(), Image.SCALE_DEFAULT));
-//        //    icons[1] = new ImageIcon(new ImageIcon(ImageIO.read(this.getClass().getClassLoader().getResource("images/die2.png"))).getImage().getScaledInstance(lbl_die2.getWidth(), lbl_die2.getHeight(), Image.SCALE_DEFAULT));
-//        //    icons[2] = new ImageIcon(new ImageIcon(ImageIO.read(this.getClass().getClassLoader().getResource("images/die3.png"))).getImage().getScaledInstance(lbl_die3.getWidth(), lbl_die3.getHeight(), Image.SCALE_DEFAULT));
-//        //    icons[3] = new ImageIcon(new ImageIcon(ImageIO.read(this.getClass().getClassLoader().getResource("images/die4.png"))).getImage().getScaledInstance(lbl_die4.getWidth(), lbl_die4.getHeight(), Image.SCALE_DEFAULT));
-//        //    icons[4] = new ImageIcon(new ImageIcon(ImageIO.read(this.getClass().getClassLoader().getResource("images/die5.png"))).getImage().getScaledInstance(lbl_die5.getWidth(), lbl_die5.getHeight(), Image.SCALE_DEFAULT));
-//        } catch (IOException ex) {
-//            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-    //    lbl_die1.setIcon(icons[0]);
-//        lbl_die2.setIcon(icons[3]);
-//        lbl_die3.setIcon(icons[4]);
-//        lbl_die4.setIcon(icons[2]);
-//        lbl_die5.setIcon(icons[5]);
-        validate();
-            
+       ThisGame = this;
+              
+     
+            icons = new ImageIcon[7];
 
+              icons[0] = new javax.swing.ImageIcon(getClass().getResource("/game/images/die1.png"));
+              icons[1] = new javax.swing.ImageIcon(getClass().getResource("/game/images/die2.png"));
+              icons[2] = new javax.swing.ImageIcon(getClass().getResource("/game/images/die3.png"));
+              icons[3] = new javax.swing.ImageIcon(getClass().getResource("/game/images/die4.png"));
+              icons[4] = new javax.swing.ImageIcon(getClass().getResource("/game/images/die5.png"));
+              icons[5] = new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"));
+              icons[6] = new javax.swing.ImageIcon(getClass().getResource("/game/images/turn.png"));
+        lbl_die1.setIcon(icons[0]);
+        lbl_die2.setIcon(icons[1]);
+        lbl_die3.setIcon(icons[2]);
+        lbl_die4.setIcon(icons[3]);
+        lbl_die5.setIcon(icons[4]);
+        
+        lbl_oppDie1.setIcon(icons[6]);
+        lbl_oppDie2.setIcon(icons[6]);
+        lbl_oppDie3.setIcon(icons[6]);
+        lbl_oppDie4.setIcon(icons[6]);
+        lbl_oppDie5.setIcon(icons[6]);
+        validate();
     }
 
     /**
@@ -84,7 +118,7 @@ public class Game extends javax.swing.JFrame {
         lbl_oppPick3 = new javax.swing.JLabel();
         lbl_oppPick4 = new javax.swing.JLabel();
         lbl_oppPick5 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btn_roll = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -99,9 +133,9 @@ public class Game extends javax.swing.JFrame {
         jLabel28 = new javax.swing.JLabel();
         jLabel29 = new javax.swing.JLabel();
         jLabel30 = new javax.swing.JLabel();
-        jLabel31 = new javax.swing.JLabel();
+        lbl_fullHouse = new javax.swing.JLabel();
         jLabel32 = new javax.swing.JLabel();
-        jLabel33 = new javax.swing.JLabel();
+        lbl_threeOfaKind = new javax.swing.JLabel();
         jLabel34 = new javax.swing.JLabel();
         jLabel35 = new javax.swing.JLabel();
         jLabel36 = new javax.swing.JLabel();
@@ -109,16 +143,16 @@ public class Game extends javax.swing.JFrame {
         jLabel38 = new javax.swing.JLabel();
         jLabel39 = new javax.swing.JLabel();
         jLabel40 = new javax.swing.JLabel();
-        jLabel41 = new javax.swing.JLabel();
-        jLabel42 = new javax.swing.JLabel();
+        lbl_fourOfaKindScore1 = new javax.swing.JLabel();
+        lbl_threeOfaKindScore1 = new javax.swing.JLabel();
         jLabel43 = new javax.swing.JLabel();
         jLabel44 = new javax.swing.JLabel();
         jLabel45 = new javax.swing.JLabel();
         jLabel46 = new javax.swing.JLabel();
-        jLabel47 = new javax.swing.JLabel();
-        jLabel48 = new javax.swing.JLabel();
-        jLabel49 = new javax.swing.JLabel();
-        jLabel50 = new javax.swing.JLabel();
+        lbl_largeStraightScore1 = new javax.swing.JLabel();
+        lbl_smallStraightScore1 = new javax.swing.JLabel();
+        lbl_fullHouseScore1 = new javax.swing.JLabel();
+        lbl_yahtzeeScore1 = new javax.swing.JLabel();
         jLabel51 = new javax.swing.JLabel();
         jLabel52 = new javax.swing.JLabel();
         jLabel53 = new javax.swing.JLabel();
@@ -137,77 +171,115 @@ public class Game extends javax.swing.JFrame {
         jLabel66 = new javax.swing.JLabel();
         jLabel67 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        txt_name = new javax.swing.JTextField();
+        btn_connect = new javax.swing.JButton();
+        txt_rival_name = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        lbl_die1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/die5.png"))); // NOI18N
         lbl_die1.setText("jLabel1");
         lbl_die1.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_die1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_die1MouseClicked(evt);
+            }
+        });
 
-        lbl_die2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/die4.png"))); // NOI18N
-        lbl_die2.setText("jLabel1");
+        lbl_die2.setText("jLabel2");
         lbl_die2.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_die2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_die2MouseClicked(evt);
+            }
+        });
 
-        lbl_die3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/die1.png"))); // NOI18N
-        lbl_die3.setText("jLabel1");
+        lbl_die3.setText("jLabel3");
         lbl_die3.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_die3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_die3MouseClicked(evt);
+            }
+        });
 
-        lbl_die4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/die6.png"))); // NOI18N
-        lbl_die4.setText("jLabel1");
+        lbl_die4.setText("jLabel4");
         lbl_die4.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_die4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_die4MouseClicked(evt);
+            }
+        });
 
-        lbl_die5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/die3.png"))); // NOI18N
-        lbl_die5.setText("jLabel1");
+        lbl_die5.setText("jLabel5");
         lbl_die5.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_die5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_die5MouseClicked(evt);
+            }
+        });
 
-        lbl_pick1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_pick1.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_pick1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
+        lbl_pick1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_pick1MouseClicked(evt);
+            }
+        });
 
-        lbl_pick2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_pick2.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_pick2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
+        lbl_pick2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_pick2MouseClicked(evt);
+            }
+        });
 
-        lbl_pick3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_pick3.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_pick3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
+        lbl_pick3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_pick3MouseClicked(evt);
+            }
+        });
 
-        lbl_pick4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_pick4.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_pick4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
+        lbl_pick4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_pick4MouseClicked(evt);
+            }
+        });
 
-        lbl_pick5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_pick5.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_pick5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
+        lbl_pick5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_pick5MouseClicked(evt);
+            }
+        });
 
-        lbl_oppDie1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppDie1.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppDie1.setText("jLabelOpp1");
 
-        lbl_oppDie2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppDie2.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppDie2.setText("jLabelOpp2");
 
-        lbl_oppDie3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppDie3.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppDie3.setText("jLabelOpp3");
 
-        lbl_oppDie4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppDie4.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppDie4.setText("jLabelOpp4");
 
-        lbl_oppDie5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppDie5.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppDie5.setText("jLabelOpp5");
 
         lbl_oppPick1.setBackground(new java.awt.Color(100, 255, 255));
         lbl_oppPick1.setForeground(new java.awt.Color(0, 0, 0));
-        lbl_oppPick1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppPick1.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppPick1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
 
-        lbl_oppPick2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppPick2.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppPick2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
 
-        lbl_oppPick3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppPick3.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppPick3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
 
-        lbl_oppPick4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppPick4.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppPick4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
 
-        lbl_oppPick5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/yahtzeeClient/images/white.png"))); // NOI18N
-        lbl_oppPick5.setPreferredSize(new java.awt.Dimension(50, 50));
+        lbl_oppPick5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/images/white.png"))); // NOI18N
 
-        jButton1.setText("Roll Dice");
+        btn_roll.setText("Roll Dice");
+        btn_roll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_rollActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Ones:");
 
@@ -235,11 +307,11 @@ public class Game extends javax.swing.JFrame {
 
         jLabel30.setText("Small Straight:");
 
-        jLabel31.setText("Full House:");
+        lbl_fullHouse.setText("Full House:");
 
         jLabel32.setText("Four of a kind:");
 
-        jLabel33.setText("Three of a kind:");
+        lbl_threeOfaKind.setText("Three of a kind:");
 
         jLabel34.setText("0");
 
@@ -255,9 +327,9 @@ public class Game extends javax.swing.JFrame {
 
         jLabel40.setText("0");
 
-        jLabel41.setText("0");
+        lbl_fourOfaKindScore1.setText("0");
 
-        jLabel42.setText("0");
+        lbl_threeOfaKindScore1.setText("0");
 
         jLabel43.setText("0");
 
@@ -267,13 +339,13 @@ public class Game extends javax.swing.JFrame {
 
         jLabel46.setText("0");
 
-        jLabel47.setText("0");
+        lbl_largeStraightScore1.setText("0");
 
-        jLabel48.setText("0");
+        lbl_smallStraightScore1.setText("0");
 
-        jLabel49.setText("0");
+        lbl_fullHouseScore1.setText("0");
 
-        jLabel50.setText("0");
+        lbl_yahtzeeScore1.setText("0");
 
         jLabel51.setText("0");
 
@@ -327,7 +399,7 @@ public class Game extends javax.swing.JFrame {
                             .addComponent(jLabel10)
                             .addComponent(jLabel9)
                             .addComponent(jLabel32)
-                            .addComponent(jLabel31))
+                            .addComponent(lbl_fullHouse))
                         .addGap(22, 22, 22)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -345,13 +417,13 @@ public class Game extends javax.swing.JFrame {
                                     .addComponent(jLabel45)
                                     .addComponent(jLabel44)
                                     .addComponent(jLabel43)
-                                    .addComponent(jLabel42)
-                                    .addComponent(jLabel41)
-                                    .addComponent(jLabel49)
-                                    .addComponent(jLabel48)
-                                    .addComponent(jLabel47)
+                                    .addComponent(lbl_threeOfaKindScore1)
+                                    .addComponent(lbl_fourOfaKindScore1)
+                                    .addComponent(lbl_fullHouseScore1)
+                                    .addComponent(lbl_smallStraightScore1)
+                                    .addComponent(lbl_largeStraightScore1)
                                     .addComponent(jLabel46)
-                                    .addComponent(jLabel50)
+                                    .addComponent(lbl_yahtzeeScore1)
                                     .addComponent(jLabel51))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -379,7 +451,7 @@ public class Game extends javax.swing.JFrame {
                             .addComponent(jLabel29)
                             .addComponent(jLabel27)
                             .addComponent(jLabel26)
-                            .addComponent(jLabel33))
+                            .addComponent(lbl_threeOfaKind))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(31, 31, 31))
         );
@@ -425,24 +497,24 @@ public class Game extends javax.swing.JFrame {
                             .addComponent(jLabel43))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel33)
-                            .addComponent(jLabel42))
+                            .addComponent(lbl_threeOfaKind)
+                            .addComponent(lbl_threeOfaKindScore1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel32)
-                            .addComponent(jLabel41))
+                            .addComponent(lbl_fourOfaKindScore1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel31)
-                            .addComponent(jLabel49))
+                            .addComponent(lbl_fullHouse)
+                            .addComponent(lbl_fullHouseScore1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel30)
-                            .addComponent(jLabel48))
+                            .addComponent(lbl_smallStraightScore1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel29)
-                            .addComponent(jLabel47))
+                            .addComponent(lbl_largeStraightScore1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel28)
@@ -450,7 +522,7 @@ public class Game extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel27)
-                            .addComponent(jLabel50)))
+                            .addComponent(lbl_yahtzeeScore1)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel52)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -494,13 +566,25 @@ public class Game extends javax.swing.JFrame {
 
         jLabel5.setText("Score Table");
 
+        txt_name.setText("Name");
+
+        btn_connect.setText("Connect");
+        btn_connect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_connectActionPerformed(evt);
+            }
+        });
+
+        txt_rival_name.setText("Rival Name");
+        txt_rival_name.setEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(64, 64, 64)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lbl_die1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -513,42 +597,53 @@ public class Game extends javax.swing.JFrame {
                         .addComponent(lbl_die5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton1)
+                            .addComponent(btn_roll)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(lbl_pick1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lbl_pick1)
                                 .addGap(18, 18, 18)
-                                .addComponent(lbl_pick2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lbl_pick2)
                                 .addGap(18, 18, 18)
-                                .addComponent(lbl_pick3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(lbl_pick3)))
                         .addGap(18, 18, 18)
-                        .addComponent(lbl_pick4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbl_pick4)
                         .addGap(18, 18, 18)
-                        .addComponent(lbl_pick5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lbl_pick5))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbl_oppPick1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lbl_oppPick2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lbl_oppPick3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lbl_oppPick4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lbl_oppPick5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btn_connect))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbl_oppDie1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lbl_oppDie1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(lbl_oppDie2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(lbl_oppDie3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lbl_oppPick1)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(lbl_oppPick2))
+                                    .addComponent(txt_rival_name, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addComponent(lbl_oppPick3)))
                         .addGap(18, 18, 18)
-                        .addComponent(lbl_oppDie2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lbl_oppDie3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lbl_oppDie4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lbl_oppDie5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(98, 98, 98)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lbl_oppDie4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(lbl_oppDie5, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(lbl_oppPick4)
+                                .addGap(18, 18, Short.MAX_VALUE)
+                                .addComponent(lbl_oppPick5)))))
+                .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(78, Short.MAX_VALUE))
+                .addContainerGap(139, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -557,20 +652,22 @@ public class Game extends javax.swing.JFrame {
                 .addComponent(jLabel5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(46, 46, 46)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lbl_oppPick1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_oppPick3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_oppPick2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_oppPick5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_oppPick4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(8, 8, 8)
+                        .addComponent(txt_rival_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lbl_oppDie1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_oppDie3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_oppDie5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_oppDie4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_oppDie2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lbl_oppPick1)
+                            .addComponent(lbl_oppPick3)
+                            .addComponent(lbl_oppPick2)
+                            .addComponent(lbl_oppPick5)
+                            .addComponent(lbl_oppPick4))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lbl_oppDie1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_oppDie3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_oppDie5, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_oppDie4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_oppDie2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(96, 96, 96)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbl_die1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -580,21 +677,149 @@ public class Game extends javax.swing.JFrame {
                             .addComponent(lbl_die4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lbl_pick1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_pick3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_pick5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_pick4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_pick2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lbl_pick1)
+                            .addComponent(lbl_pick3)
+                            .addComponent(lbl_pick5)
+                            .addComponent(lbl_pick4)
+                            .addComponent(lbl_pick2))
                         .addGap(18, 18, 18)
-                        .addComponent(jButton1))
+                        .addComponent(btn_roll))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(77, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_connect))
+                .addGap(24, 24, 24))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void lbl_die1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_die1MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_die1,lbl_pick1,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_die1MouseClicked
+
+    private void btn_rollActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_rollActionPerformed
+        // TODO add your handling code here:
+      
+        rollCount++;
+        for(int i=0;i<5;i++){
+            diceValues[i]=(int)(Math.random()*5);
+        }
+        setImages(lbl_die1);
+        setImages(lbl_die2);
+        setImages(lbl_die3);
+        setImages(lbl_die4);
+        setImages(lbl_die5);
+        
+        myDesk = diceValues;
+        
+        String hand = score.getHand(myDesk);
+        
+        switch(hand){
+        
+            case "fullHouse":
+                lbl_fullHouseScore1.setForeground(Color.red);
+                lbl_fullHouseScore1.setText(Integer.toString(score.score));
+                break;
+            case "threeOfaKind":
+                lbl_threeOfaKindScore1.setForeground(Color.red);
+                lbl_threeOfaKindScore1.setText(Integer.toString(score.score));
+                break;
+            case "fourOfaKind":
+                lbl_fourOfaKindScore1.setForeground(Color.red);
+                lbl_fourOfaKindScore1.setText(Integer.toString(score.score));
+                break;
+            case "yahtzee":
+                lbl_yahtzeeScore1.setForeground(Color.red);
+                lbl_yahtzeeScore1.setText(Integer.toString(score.score));
+                break;
+            case "straight":
+                lbl_largeStraightScore1.setForeground(Color.red);
+                lbl_largeStraightScore1.setText(Integer.toString(score.score));
+                break;
+            case "smallStraight":
+                lbl_smallStraightScore1.setForeground(Color.red);
+                lbl_smallStraightScore1.setText(Integer.toString(score.score));
+                break;
+        }
+
+        myDesk = diceValues;
+        Message msg = new Message(Message.Message_Type.Selected);
+        msg.content = myDesk;
+        Client.Send(msg);
+//        setPlayerDeskImages(lbl_oppDie1, rivalDesk);
+//        setPlayerDeskImages(lbl_oppDie2, rivalDesk);
+//        setPlayerDeskImages(lbl_oppDie3, rivalDesk);
+//        setPlayerDeskImages(lbl_oppDie4, rivalDesk);
+//        setPlayerDeskImages(lbl_oppDie5, rivalDesk);
+        if(rollCount==3){
+            btn_roll.setEnabled(false);
+        }
+    }//GEN-LAST:event_btn_rollActionPerformed
+
+    private void lbl_die2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_die2MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_die2,lbl_pick2,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_die2MouseClicked
+
+    private void lbl_die3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_die3MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_die3,lbl_pick3,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_die3MouseClicked
+
+    private void lbl_die4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_die4MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_die4,lbl_pick4,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_die4MouseClicked
+
+    private void lbl_die5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_die5MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_die5,lbl_pick5,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_die5MouseClicked
+
+    private void lbl_pick1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_pick1MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_pick1,lbl_die1,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_pick1MouseClicked
+
+    private void lbl_pick2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_pick2MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_pick2,lbl_die2,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_pick2MouseClicked
+
+    private void lbl_pick3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_pick3MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_pick3,lbl_die3,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_pick3MouseClicked
+
+    private void lbl_pick4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_pick4MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_pick4,lbl_die4,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_pick4MouseClicked
+
+    private void lbl_pick5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_pick5MouseClicked
+        // TODO add your handling code here:
+        changeIcon(lbl_pick5,lbl_die5,lbl_oppPick1);
+    }//GEN-LAST:event_lbl_pick5MouseClicked
+
+    private void btn_connectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_connectActionPerformed
+        // TODO add your handling code here:
+        //bağlanılacak server ve portu veriyoruz
+        Client.Start("127.0.0.1", 2000);
+        //başlangıç durumları
+//        lbl_oppDie1.setIcon(icons[0]);
+//        lbl_oppDie2.setIcon(icons[1]);
+//        lbl_oppDie3.setIcon(icons[2]);
+//        lbl_oppDie4.setIcon(icons[3]);
+//        lbl_oppDie5.setIcon(icons[4]);
+        btn_connect.setEnabled(false);
+        txt_name.setEnabled(false);
+   //     btn_pick.setEnabled(false);
+    }//GEN-LAST:event_btn_connectActionPerformed
 
     /**
      * @param args the command line arguments
@@ -633,7 +858,8 @@ public class Game extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btn_connect;
+    private javax.swing.JButton btn_roll;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -643,9 +869,7 @@ public class Game extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
-    private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
-    private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
@@ -654,17 +878,11 @@ public class Game extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
-    private javax.swing.JLabel jLabel41;
-    private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
     private javax.swing.JLabel jLabel45;
     private javax.swing.JLabel jLabel46;
-    private javax.swing.JLabel jLabel47;
-    private javax.swing.JLabel jLabel48;
-    private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel50;
     private javax.swing.JLabel jLabel51;
     private javax.swing.JLabel jLabel52;
     private javax.swing.JLabel jLabel53;
@@ -691,6 +909,10 @@ public class Game extends javax.swing.JFrame {
     private javax.swing.JLabel lbl_die3;
     private javax.swing.JLabel lbl_die4;
     private javax.swing.JLabel lbl_die5;
+    private javax.swing.JLabel lbl_fourOfaKindScore1;
+    private javax.swing.JLabel lbl_fullHouse;
+    private javax.swing.JLabel lbl_fullHouseScore1;
+    private javax.swing.JLabel lbl_largeStraightScore1;
     private javax.swing.JLabel lbl_oppDie1;
     private javax.swing.JLabel lbl_oppDie2;
     private javax.swing.JLabel lbl_oppDie3;
@@ -706,5 +928,11 @@ public class Game extends javax.swing.JFrame {
     private javax.swing.JLabel lbl_pick3;
     private javax.swing.JLabel lbl_pick4;
     private javax.swing.JLabel lbl_pick5;
+    private javax.swing.JLabel lbl_smallStraightScore1;
+    private javax.swing.JLabel lbl_threeOfaKind;
+    private javax.swing.JLabel lbl_threeOfaKindScore1;
+    private javax.swing.JLabel lbl_yahtzeeScore1;
+    public javax.swing.JTextField txt_name;
+    public javax.swing.JTextField txt_rival_name;
     // End of variables declaration//GEN-END:variables
 }
